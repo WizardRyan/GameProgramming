@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!--Material Design-->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-orange.min.css">
+        <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+        <link rel="stylesheet" href="styles.css">
+        <script defer src="scripts.js"></script>
+    </head>
+    <body>
+        <div class="master-wrapper">
+            <header class="top-header">
+                Browser Game Loop
+            </header>
+            <div class="panel-container">
+                <div class="output-panel" id="output-panel">
+                </div>
+                <div class="input-panel">
+                    <!-- Simple Textfield -->
+                    <!-- Textfield with Floating Label -->
+
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input class="mdl-textfield__input" type="text" id="name">
+                        <label class="mdl-textfield__label" for="sample3">Name</label>
+                    </div>
+  
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input class="mdl-textfield__input" type="number" id="interval">
+                        <label class="mdl-textfield__label" for="sample3">Interval</label>
+                    </div>
+
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input class="mdl-textfield__input" type="number" id="num-times">
+                        <label class="mdl-textfield__label" for="sample3"># Times</label>
+                    </div>
+  
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="add-event-button" onclick="addEvent()">
+                        Add Event
+                    </button>
+                </div>
+            </div>
+            <footer class="bottom-footer">
+                Made for CS5410 by Ryan Andersen
+            </footer>
+        </div>
+    </body>
+</html>

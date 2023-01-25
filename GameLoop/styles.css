@@ -1,0 +1,53 @@
+.master-wrapper{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+body{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.top-header{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 16px 16px;
+    background-color: rgb(33,150,243);
+    color: white;
+    font-size: 24px;
+}
+
+.bottom-footer{
+    padding: 9px 9px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    background-color: rgb(33,150,243);
+    color: white;
+}
+
+.panel-container{
+    display: flex;
+    margin: 20px 0;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.output-panel{
+    display:flex;
+    flex-direction: column;
+    min-width: 250px;
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.input-panel{
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+}
+
