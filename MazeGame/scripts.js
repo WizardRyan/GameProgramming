@@ -11,8 +11,10 @@ let prevTime = performance.now();
 class Maze{
     constructor(maseSize){
         this.maseSize = maseSize;
-        this.mazeArray = this.generateMaze();
+        this.cellDirections = ["up", "down", "left", "right"];
+        this.oppositeDirections = {right: "left", left: "right", up: "down", down: "up"};
         this.frontierCells = [];
+        this.generateMaze();
     }
 
     generateMaze(){
@@ -26,16 +28,27 @@ class Maze{
             let fCell = this.getRandomFrontier();
             let direction = this.getRandomAdjacentConnectedCellDirection(fCell);
             fCell[`${direction}Wall`] = false;
+            fCell[direction][`${this.oppositeDirections[direction]}Wall`] = false;
             fCell.isConnected = true;
             fCell.isFrontier = false;
-            this.frontierCells = this.frontierCells.filter(cell => cell.x == fCell.x && cell.y == fCell.y);
+            this.frontierCells = this.frontierCells.filter(cell => !(cell.x == fCell.x && cell.y == fCell.y));
 
-            //mark adjacent cells as frontier, add to frontier list
+            this.markAdjacentAsFrontier(fCell);
+        }
+    }
+
+
+    markAdjacentAsFrontier(cell){
+        for(let direction of this.cellDirections){
+            if(cell[direction] && !cell[direction].isConnected){
+                cell[direction].isFrontier = true;
+                this.frontierCells.push(cell[direction]);
+            }
         }
     }
 
     getRandomFrontier(){
-        return this.frontierCells(Math.floor(Math.random() * this.frontierCells.length));
+        return this.frontierCells[Math.floor(Math.random() * this.frontierCells.length)];
     }
 
     getRandomAdjacentConnectedCellDirection(cell){
@@ -43,23 +56,9 @@ class Maze{
         let direction = "";
         while(selectedCell == null){
             let num = Math.floor(Math.random() * 4);
-            if(num == 0){
-                selectedCell = cell.left;
-                direction == "left";
-            }
-            else if (num == 1){
-                selectedCell = cell.right;
-                direction = "right";
-            }
-            else if (num == 2){
-                selectedCell = cell.up;
-                direction = "up";
-            }
-            else if (num == 3){
-                selectedCell = cell.down;
-                direction = "down";
-            }
-            if(!(selectedCell != null && selectedCell.isConnected)){
+            direction = this.cellDirections[num];
+            selectedCell = cell[direction];
+            if(selectedCell == null || !selectedCell.isConnected){
                 selectedCell = null;
             }
         }
@@ -76,6 +75,7 @@ class Maze{
     }
 
     generateBlockedOutMaze(){
+        this.mazeArray = [];
         this.fillCells();
         this.linkCells();
     }
@@ -93,20 +93,28 @@ class Maze{
     linkCells(){
         for(let i = 0; i < this.maseSize; i++){
             for(let j = 0; j < this.maseSize; j++){
-                if(j + 1 < this.maseSize){
-                    this.mazeArray[i][j].up = this.mazeArray[i][j + 1];
-                }
-                if(j - 1 > 0){
-                    this.mazeArray[i][j].down = this.mazeArray[i][j - 1];
+                if(i - 1 >= 0){
+                    this.mazeArray[i][j].up = this.mazeArray[i - 1][j];
                 }
                 if(i + 1 < this.maseSize){
-                    this.mazeArray[i][j].right = this.mazeArray[i  + 1][j];
+                    this.mazeArray[i][j].down = this.mazeArray[i + 1][j];
                 }
-                if(i - 1 > 0){
-                    this.mazeArray[i][j].left = this.mazeArray[i - 1][j];
+                if(j + 1 < this.maseSize){
+                    this.mazeArray[i][j].right = this.mazeArray[i][j + 1];
+                }
+                if(j - 1 >= 0){
+                    this.mazeArray[i][j].left = this.mazeArray[i][j - 1];
                 }
             }
         } 
+    }
+
+    logMaze(){
+        for(let row of this.mazeArray){
+            for(let cell of row){
+                console.log(cell);
+            }
+        }
     }
 }
 
@@ -145,3 +153,6 @@ function render(){
 function update(elapsedTime){
 
 }
+
+let maze = new Maze(3);
+maze.logMaze();
