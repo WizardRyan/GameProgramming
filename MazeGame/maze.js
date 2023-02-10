@@ -1,16 +1,8 @@
 //Written by Ryan Andersen A02288683 for CS5410
 
-const addEventButton = document.getElementById("add-event-button");
-const outputPanel = document.getElementById("output-panel");
-const nameInput = document.getElementById("name");
-const intervalInput = document.getElementById("interval");
-const numTimes = document.getElementById("num-times");
-
-let prevTime = performance.now();
-
-class Maze{
-    constructor(maseSize){
-        this.maseSize = maseSize;
+export class Maze{
+    constructor(mazeSize){
+        this.mazeSize = mazeSize;
         this.cellDirections = ["up", "down", "left", "right"];
         this.oppositeDirections = {right: "left", left: "right", up: "down", down: "up"};
         this.frontierCells = [];
@@ -81,9 +73,9 @@ class Maze{
     }
 
     fillCells(){
-        for(let i = 0; i < this.maseSize; i++){
+        for(let i = 0; i < this.mazeSize; i++){
             let row = [];
-            for(let j = 0; j < this.maseSize; j++){
+            for(let j = 0; j < this.mazeSize; j++){
                 row.push(new PrimCell(i, j));
             }
             this.mazeArray.push(row);
@@ -91,15 +83,15 @@ class Maze{
     }
 
     linkCells(){
-        for(let i = 0; i < this.maseSize; i++){
-            for(let j = 0; j < this.maseSize; j++){
+        for(let i = 0; i < this.mazeSize; i++){
+            for(let j = 0; j < this.mazeSize; j++){
                 if(i - 1 >= 0){
                     this.mazeArray[i][j].up = this.mazeArray[i - 1][j];
                 }
-                if(i + 1 < this.maseSize){
+                if(i + 1 < this.mazeSize){
                     this.mazeArray[i][j].down = this.mazeArray[i + 1][j];
                 }
-                if(j + 1 < this.maseSize){
+                if(j + 1 < this.mazeSize){
                     this.mazeArray[i][j].right = this.mazeArray[i][j + 1];
                 }
                 if(j - 1 >= 0){
@@ -107,6 +99,10 @@ class Maze{
                 }
             }
         } 
+    }
+
+    getMazeArray(){
+        return this.mazeArray;
     }
 
     logMaze(){
@@ -118,7 +114,7 @@ class Maze{
     }
 }
 
-class PrimCell {
+export class PrimCell {
     constructor(x, y){
         this.isFrontier = false;
         this.isConnected = false;
@@ -134,25 +130,3 @@ class PrimCell {
         this.y = y;
     }
 }
-
-//start game loop
-requestAnimationFrame(gameLoop);
-
-function gameLoop(timeStamp){
-    let elapsedTime = timeStamp - prevTime;
-    prevTime = timeStamp;
-    update(elapsedTime);
-    render();
-    requestAnimationFrame(gameLoop);
-}
-
-function render(){
-
-}
-
-function update(elapsedTime){
-
-}
-
-let maze = new Maze(3);
-maze.logMaze();
