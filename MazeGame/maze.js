@@ -7,6 +7,8 @@ export class Maze{
         this.oppositeDirections = {right: "left", left: "right", up: "down", down: "up"};
         this.frontierCells = [];
         this.generateMaze();
+        this.shortestPath = undefined;
+        this.solveMaze([0,0]);
     }
 
     generateMaze(){
@@ -105,6 +107,56 @@ export class Maze{
         return this.mazeArray;
     }
 
+    solveMaze(startingPoint){
+        let toVisit = [];
+        toVisit.push(startingPoint);
+        
+        let visited = [];
+        let prev = [];
+        
+        for(let i =0; i < this.mazeSize; i++){
+            visited.push([]);
+            prev.push([]);
+            for(let j = 0; j < this.mazeSize; j++){
+                visited[i].push(false);
+                prev[i].push(null);
+            }
+        }
+
+        visited[startingPoint[0]][startingPoint[1]] = true;
+
+        while (toVisit.length > 0){
+            let cellIndex = toVisit.pop();
+            let neighbors = this.getNeighbors(cellIndex);
+            for(let next of neighbors){
+                if(!visited[next[0]][next[1]]){
+                    toVisit.push(next);
+                    visited[next[0]][next[1]] = true;
+                    prev[next[0]][next[1]] = cellIndex;
+                }
+            }
+        }
+        
+        let path = [];
+        for(let at = [this.mazeSize - 1, this.mazeSize - 1]; at != null; at = prev[at[0]][at[1]]){
+            path.push(at);
+        }
+        path.reverse();
+        this.shortestPath = path;
+    }
+
+    getNeighbors(cellIndex){
+        let neighbors = [];
+
+        let cell = this.mazeArray[cellIndex[0]][cellIndex[1]];
+        for(let direction of this.cellDirections){
+            if(cell[direction] && !cell[`${direction}Wall`]){
+                neighbors.push([cell[direction].x, cell[direction].y]);
+            }
+        }
+        return neighbors;
+    }
+
     logMaze(){
         for(let row of this.mazeArray){
             for(let cell of row){
@@ -112,6 +164,7 @@ export class Maze{
             }
         }
     }
+
 }
 
 export class PrimCell {

@@ -10,6 +10,7 @@ export class Renderer {
 
         this.cellWidth = 0;
         this.maze;
+        this.setImages();
     }
 
     /**
@@ -17,6 +18,7 @@ export class Renderer {
      * @param {Maze} maze 
      */
     static drawMaze(maze){
+        this.ctx.drawImage(this.bgImg, 0, 0, this.canvas.width, this.canvas.width);
         this.cellWidth = this.canvas.width / maze.mazeSize;
         this.maze = maze;
         this.ctx.beginPath();
@@ -53,6 +55,8 @@ export class Renderer {
             }
         }
         this.drawGoal();
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeStyle = "#8a2450";
         this.ctx.stroke();
     }
 
@@ -61,15 +65,47 @@ export class Renderer {
     }
 
     static drawPlayer(playerLocation){
-        if(this.maze){
-            this.clear();
-            this.drawMaze(this.maze);
-            this.ctx.fillRect(playerLocation.x * this.cellWidth, playerLocation.y * this.cellWidth, this.cellWidth, this.cellWidth);
-        }
+        this.ctx.drawImage(this.oreoImg, playerLocation.x * this.cellWidth, playerLocation.y * this.cellWidth, this.cellWidth, this.cellWidth);
     }
 
     static drawGoal(){
         let endPt = (this.maze.mazeSize -1) * this.cellWidth;
-        this.ctx.fillRect(endPt, endPt, this.cellWidth, this.cellWidth, this.cellWidth);
+        this.ctx.drawImage(this.foodBowlImg, endPt, endPt, this.cellWidth, this.cellWidth);
+    }
+
+    static drawBreadCrumbs(breadcrumbs){
+        for(let breadcrumb of breadcrumbs){
+            this.ctx.drawImage(this.pawPrintsImg, breadcrumb.x * this.cellWidth, breadcrumb.y * this.cellWidth, this.cellWidth, this.cellWidth);
+        }
+    }
+
+    static drawShortestPath(shortestPath){
+        for(let i = 0; i < shortestPath.length -1; i++){
+            this.ctx.drawImage(this.shakingFoodBowlImg, shortestPath[i][1] * this.cellWidth, shortestPath[i][0] * this.cellWidth, this.cellWidth, this.cellWidth);
+        }
+    }
+
+    static drawHint(cell){
+        this.ctx.drawImage(this.catNoseImg, cell[1] * this.cellWidth, cell[0] * this.cellWidth, this.cellWidth, this.cellWidth);
+    }
+
+
+    static async getImage(url){
+        let img = new Image();
+        img.src = url;
+        return new Promise((resolve, reject) => {
+            img.onload = () => {
+                resolve(img);
+            };
+        });
+    }
+
+    static async setImages(){
+        this.oreoImg = await this.getImage('./images/Oreo.png');
+        this.foodBowlImg = await this.getImage('/images/foodBowl.png');
+        this.pawPrintsImg = await this.getImage('./images/pawPrint.png');
+        this.catNoseImg = await this.getImage('./images/catNose.png');
+        this.shakingFoodBowlImg = await this.getImage('./images/shakingFoodBowl.png');
+        this.bgImg = await this.getImage('./images/bg.png');
     }
 }
