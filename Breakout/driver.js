@@ -6,16 +6,17 @@ import { Renderer } from "./renderer.js";
 let prevTime = performance.now();
 let elapsedTime;
 let timeRan = 0;
-//start game loop
+//start game loopssssssssssssssssssssssssssss
 requestAnimationFrame(gameLoop);
 
 function gameLoop(timeStamp){
     elapsedTime = timeStamp - prevTime;
     prevTime = timeStamp;
     update(elapsedTime);
-    //elapsedTime used for rainbow effect
+    //elapsedTime used for rainbow effects
     render();
     requestAnimationFrame(gameLoop);
+    
 }
 
 function render(){
@@ -24,6 +25,6 @@ function render(){
 
 function update(elapsedTime){
     InputManager.processInputs(elapsedTime);
-    GameManager.Tick(elapsedTime);
+    GameManager.tick(elapsedTime);
     timeRan += elapsedTime;
 }

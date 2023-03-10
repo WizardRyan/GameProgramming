@@ -65,7 +65,7 @@ export class Renderer {
         let width = paddle.width * this.canvas.width;
         let height = paddle.height * this.canvas.height;
         let locX = paddle.location.x * this.canvas.width;
-        let locY = (paddle.location.y * this.canvas.height) - height;
+        let locY = paddle.location.y * this.canvas.height;
         try{
             // this.ctx.drawImage(this.oreoImg, locX, locY, width, height);
             if((this.timePassedSinceLastColorChanged / 1000 ) >= this.SONG_BPS){
@@ -99,10 +99,12 @@ export class Renderer {
         for(let ball of balls){
             let locX = ball.location.x * this.canvas.width;
             let locY = ball.location.y * this.canvas.height;
-            let radius = GameManager.ALL_BALLS_RADIUS * ((this.canvas.width + this.canvas.height) / 2);
+            let width = GameManager.ALL_BALLS_DIAMETER * this.canvas.width;
+            let height = GameManager.ALL_BALLS_DIAMETER * this.canvas.height;
 
             try{
-                this.ctx.drawImage(this.oreoImg, locX, locY, radius, radius);
+                this.ctx.drawImage(this.nyanCatImg, locX, locY, width, height);
+                // this.ctx.fillRect(locX, locY, width, height);
             }
             catch(err){
                 console.log(`image not loaded: ${err}`);
@@ -121,6 +123,6 @@ export class Renderer {
     }
 
     static async setImages(){
-        this.oreoImg = await this.getImage('./images/Oreo.png');
+        this.nyanCatImg = await this.getImage('./images/nyanCat.png');
     }
 }

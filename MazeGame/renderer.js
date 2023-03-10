@@ -102,7 +102,7 @@ export class Renderer {
 
     static async setImages(){
         this.oreoImg = await this.getImage('./images/Oreo.png');
-        this.foodBowlImg = await this.getImage('/images/foodBowl.png');
+        this.foodBowlImg = await this.getImage('./images/foodBowl.png');
         this.pawPrintsImg = await this.getImage('./images/pawPrint.png');
         this.catNoseImg = await this.getImage('./images/catNose.png');
         this.shakingFoodBowlImg = await this.getImage('./images/shakingFoodBowl.png');

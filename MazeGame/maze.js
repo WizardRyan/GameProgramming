@@ -1,5 +1,4 @@
 //Written by Ryan Andersen A02288683 for CS5410
-
 export class Maze{
     constructor(mazeSize){
         this.mazeSize = mazeSize;

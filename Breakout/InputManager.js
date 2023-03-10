@@ -5,6 +5,7 @@ export class InputManager {
         this.controls = {
             left: ["a", "j", "ArrowLeft"], 
             right: ["d", "l", "ArrowRight"], 
+            pause: ["Escape"]
         };
         this.pressedKeys = [];
     }
@@ -46,9 +47,14 @@ export class InputManager {
 }
 
 window.addEventListener("keydown", e => {
-    InputManager.addInput(e);
+    if(InputManager.controls.pause.includes(e.key)){
+        GameManager.inMenu = !GameManager.inMenu;
+    }
+    else{
+        InputManager.addInput(e);
+    }
 });
 
 window.addEventListener("keyup", e => {
     InputManager.removeInput(e);
-})
+});
