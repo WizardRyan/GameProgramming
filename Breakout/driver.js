@@ -2,6 +2,7 @@
 import { GameManager } from "./gameManager.js";
 import { InputManager } from "./InputManager.js";
 import { Renderer } from "./renderer.js";
+import { UIManager } from './UIManager.js'
 
 let prevTime = performance.now();
 let elapsedTime;

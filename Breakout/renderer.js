@@ -31,18 +31,34 @@ export class Renderer {
     }
     
     static drawGame(timeElapsed){
-        this.clear();
-
-        this.ctx.fillStyle = "rgb(200, 200, 200)";
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        this.drawBricks(GameManager.bricks);
-        this.drawPaddle(GameManager.paddle, timeElapsed);
-        this.drawBalls(GameManager.balls);
+        if(this.bgImg){
+            this.clear();
+    
+            this.ctx.drawImage(this.bgImg, 0, 0, this.canvas.width, this.canvas.height);
+    
+            // this.ctx.fillStyle = "rgb(200, 200, 200)";
+            // this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+            this.drawLives();
+            this.drawBricks(GameManager.bricks);
+            this.drawPaddle(GameManager.paddle, timeElapsed);
+            this.drawBalls(GameManager.balls);
+            this.drawTimer();
+            this.drawScore();
+        }
     }
 
     static clear(){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    static drawLives(){
+        let width = GameManager.ALL_BALLS_DIAMETER * this.canvas.width;
+        let height = GameManager.ALL_BALLS_DIAMETER * this.canvas.height;
+        let startX = GameManager.BRICK_MARGIN * 3 * this.canvas.width;
+        for(let i = 0; i < GameManager.livesLeft; i++){
+            this.ctx.drawImage(this.nyanCatImg, startX + GameManager.BRICK_MARGIN * this.canvas.width + (width * i), 0.9 * this.canvas.height, width, height);
+        }
     }
 
     static drawBricks(bricks){
@@ -112,6 +128,38 @@ export class Renderer {
         }
     }
 
+    static drawTimer(){
+        if(GameManager.countDownTimer <= 1000){
+            this.drawText("3");
+        }
+        else if (GameManager.countDownTimer <= 2000){
+            this.drawText("2");
+        }
+        else if (GameManager.countDownTimer <= 3000){
+            this.drawText("1");
+        }
+    }
+
+    static drawText(t){
+        this.ctx.fillStyle = "rgb(20, 20, 20)";
+        this.ctx.font = ("100px sans-serif")
+        this.ctx.fillText(t, (this.canvas.width / 2) - 18, (this.canvas.height / 2));
+
+        this.ctx.fillStyle = "rgb(255, 255, 255)";
+        this.ctx.font = ("90px sans-serif")
+        this.ctx.fillText(t, (this.canvas.width / 2) - 22.5, (this.canvas.height / 2) - 10);
+    }
+
+    static drawScore(){
+        this.ctx.fillStyle = "rgb(0, 0, 0)";
+        this.ctx.font = ("20px sans-serif");
+        this.ctx.fillText(`Score: ${GameManager.score}`, this.canvas.width * 0.835, this.canvas.height * 0.945);
+
+        this.ctx.fillStyle = "rgb(255, 255, 255)";
+        this.ctx.font = ("20px sans-serif");
+        this.ctx.fillText(`Score: ${GameManager.score}`, this.canvas.width * 0.83, this.canvas.height * 0.94);
+    }
+
     static async getImage(url){
         let img = new Image();
         img.src = url;
@@ -124,5 +172,6 @@ export class Renderer {
 
     static async setImages(){
         this.nyanCatImg = await this.getImage('./images/nyanCat.png');
+        this.bgImg = await this.getImage('./images/bg.jpg');
     }
 }

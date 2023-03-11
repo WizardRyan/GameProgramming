@@ -1,4 +1,5 @@
 import { GameManager } from "./gameManager.js";
+import { UIManager } from "./UIManager.js";
 
 export class InputManager {
     static {
@@ -29,17 +30,19 @@ export class InputManager {
     }
 
     static processInputs(elapsedTime){
-        for(let key of this.pressedKeys){
-            let movementAmount = GameManager.PLAYER_MOVEMENT_SPEED / elapsedTime;
-
-            if(this.controls.right.includes(key)){
-                if(GameManager.paddle.location.x < 1.0  - GameManager.paddle.width){
-                    GameManager.paddle.location.x += movementAmount;
+        if(GameManager.countDownTimer >= 3000 && !UIManager.inAMenu){
+            for(let key of this.pressedKeys){
+                let movementAmount = GameManager.PLAYER_MOVEMENT_SPEED / elapsedTime;
+    
+                if(this.controls.right.includes(key)){
+                    if(GameManager.paddle.location.x < 1.0  - GameManager.paddle.width){
+                        GameManager.paddle.location.x += movementAmount;
+                    }
                 }
-            }
-            else if(this.controls.left.includes(key)){
-                if(GameManager.paddle.location.x > 0){
-                    GameManager.paddle.location.x -= movementAmount;
+                else if(this.controls.left.includes(key)){
+                    if(GameManager.paddle.location.x > 0){
+                        GameManager.paddle.location.x -= movementAmount;
+                    }
                 }
             }
         }
@@ -48,7 +51,12 @@ export class InputManager {
 
 window.addEventListener("keydown", e => {
     if(InputManager.controls.pause.includes(e.key)){
-        GameManager.inMenu = !GameManager.inMenu;
+        if(!UIManager.inAMenu){
+            UIManager.showGenericMenu(UIManager.pauseMenuEl);
+        }
+        else{
+            UIManager.setDefaultState();
+        }
     }
     else{
         InputManager.addInput(e);

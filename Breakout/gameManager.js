@@ -1,10 +1,12 @@
+import { UIManager } from "./UIManager.js";
+
 export class Ball{
     constructor(location, direction, speed){
         this.location = location;
         this.direction = direction;
         this.speed = speed;
         this.numBricksRemoved = 0;
-        this.speedIncrement = 0.5;
+        this.speedIncrement = 0.05;
         this.pointSteps = [4, 12, 36, 62];
     }
 
@@ -21,6 +23,10 @@ export class Paddle{
         this.width = width;
         this.height = height;
         this.location = location;
+        this.hasBeenShrunk = false;
+        this.isShrinking = false;
+        this.originalWidth = width;
+        this.shrinkToDeath = false;
     }
 }
 
@@ -40,13 +46,15 @@ export class GameManager{
         this.BRICK_POINT_MAP = {0:1, 1:1, 2:2, 3:2, 4:3, 5:3, 6:5, 7:5};
         this.ALL_BALLS_DIAMETER = 0.05;
         this.DEFUALT_BALL_SPEED = 0.1;
-        this.PLAYER_MOVEMENT_SPEED = 0.20;
+        this.PLAYER_MOVEMENT_SPEED = 0.15;
         this.NUM_BRICKS_IN_A_ROW = 14;
         this.NUM_BRICK_ROWS = 8;
         this.BRICK_MARGIN = .005;
         this.BRICK_WIDTH = (1.0 - ((this.NUM_BRICKS_IN_A_ROW + 1) * this.BRICK_MARGIN))/this.NUM_BRICKS_IN_A_ROW;
         this.BRICK_HEIGHT = 0.028;
         this.BRICK_DISTANCE_FROM_TOP = 0.2;
+        this.DEFAULT_PADDLE_WIDTH = 0.15;
+        this.DEFAULT_PADDLE_HEIGHT = 0.03;
 
         this.setDefaultState();
     }
@@ -69,7 +77,8 @@ export class GameManager{
         this.livesLeft = 3;
         this.score = 0;
 
-        this.inMenu = false;
+        this.countDownTimer = 0;
+        this.hundredPointsCounter = 0;
     }
 
     static fillBricks(){
@@ -106,10 +115,46 @@ export class GameManager{
     }
 
     static tick(elapsedTime){
-        if(!this.inMenu){
-            let collisions = this.detectCollisions();
-            this.moveBalls(elapsedTime, collisions);
-            this.clearBricks(collisions);
+        if(!UIManager.inAMenu){
+            if(this.countDownTimer < 3000){
+                this.countDownTimer += elapsedTime;
+            }
+            else{
+                let collisions = this.detectCollisions();
+                this.moveBalls(elapsedTime, collisions);
+                this.clearBricks(collisions);
+                this.shrinkPaddle(collisions, elapsedTime)
+            }
+        }
+    }
+
+    static shrinkPaddle(collisions, elapsedTime){
+        if(this.paddle.shrinkToDeath){
+            if(this.paddle.width > 0){
+                let shrinkSpeed = 0.05 / elapsedTime;
+                this.paddle.width -= shrinkSpeed;
+            }
+        }
+        else{
+            if(!this.paddle.hasBeenShrunk && !this.paddle.isShrinking){
+                for(let collision of collisions){
+                    if(collision.type == "brick"){
+                        if(collision.brickIndex.row == 0){
+                            this.paddle.isShrinking = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            else if(this.paddle.isShrinking){
+                if(this.paddle.width > this.paddle.originalWidth / 2){
+                    let shrinkSpeed = 0.05 / elapsedTime;
+                    this.paddle.width -= shrinkSpeed;
+                }
+                else{
+                    this.paddle.isShrinking = false;
+                }
+            }
         }
     }
 
@@ -149,11 +194,10 @@ export class GameManager{
 
     static moveBalls(elapsedTime, collisions){
         if(collisions.length > 0){
-            console.log(`collisions: ${JSON.stringify(collisions)}`);
             for(let collision of collisions){
                 if(collision.type == "brick"){
                     this.balls[collision.ballIndex].direction = collision.fromDirection == "bottom" ? this.getReflectionVector(this.balls[collision.ballIndex].direction, {x: 0, y: -1}) :  this.getReflectionVector(this.balls[collision.ballIndex].direction, {x:0, y:1});
-                    console.log(`ball: ${JSON.stringify(this.balls[collision.ballIndex])}`);
+                    this.balls[collision.ballIndex].incrementBricksRemoved();
                 }
                 else if (collision.type == "paddle"){
                     this.balls[collision.ballIndex].direction = this.getReflectionVector(this.balls[collision.ballIndex].direction, {x:0, y:1});
@@ -167,10 +211,14 @@ export class GameManager{
                         normal = {x: 0, y: -1};
                     }
                     else if(collision.wall == "bottom"){
-                        this.setDefaultState();
-                        return;
+                        this.ballHitBottom();
                     }
-                    this.balls[collision.ballIndex].direction = this.getReflectionVector(this.balls[collision.ballIndex].direction, normal);
+                    try{
+                        this.balls[collision.ballIndex].direction = this.getReflectionVector(this.balls[collision.ballIndex].direction, normal);
+                    }
+                    catch(err){
+                        console.log(`error updating ball direction: ${err}`);
+                    }
                 }
             }
         }
@@ -178,6 +226,38 @@ export class GameManager{
             ball.location.x += (ball.direction.x * ball.speed) / elapsedTime;
             ball.location.y += (ball.direction.y * ball.speed) / elapsedTime;
         }
+    }
+
+    static ballHitBottom(ballIndex){
+        if(this.balls.length == 1){
+            this.paddle.shrinkToDeath = true;
+            if(this.paddle.width <= 0){
+                this.livesLeft--;
+                this.lostLife();
+                return;
+            }
+        }
+        else{
+            this.balls.splice(ballIndex, 1);
+        }
+    }
+
+    static lostLife(){
+        if(this.livesLeft < 0){
+            this.gameOver();
+        }
+        else{
+            this.paddle = new Paddle(0.15, 0.03, {x: 0.5 - (0.15/2), y: 1 - 0.03});
+    
+            let startBall = new Ball({x: 0.5 - this.ALL_BALLS_DIAMETER /2, y: 1 - this.paddle.height - this.ALL_BALLS_DIAMETER - 0.001}, this.getNiceDirection(true), this.DEFUALT_BALL_SPEED);
+            this.balls.push(startBall);
+    
+            this.countDownTimer = 0;
+        }
+    }
+
+    static gameOver(){
+        UIManager.showGameOver();
     }
 
     /**
@@ -218,12 +298,32 @@ export class GameManager{
         for(let collision of collisions){
             if(collision.type == "brick"){
                 try{
+                    let rowLength = this.bricks[collision.brickIndex.row];
                     this.bricks[collision.brickIndex.row].splice(collision.brickIndex.column, 1);
+                    this.incrementScore(this.BRICK_POINT_MAP[7 - collision.brickIndex.row]);
+                    if(rowLength == 1){
+                        this.incrementScore(25);
+                    }
+                    
                 }
                 catch(err){
                     console.log(`failed to remove brick: ${err}`);
                 }
             }
         }
+    }
+
+    static incrementScore(val){
+        this.score += val;
+        this.hundredPointsCounter += val;
+        if(this.hundredPointsCounter >= 100){
+            this.hundredPointsCounter = this.hundredPointsCounter - 100;
+            this.releaseAnotherBall();
+        }
+    }
+    
+    static releaseAnotherBall(){
+        let ball = new Ball({x: this.paddle.location.x + this.ALL_BALLS_DIAMETER /2, y: 1 - this.paddle.height - this.ALL_BALLS_DIAMETER - 0.001}, this.getNiceDirection(true), this.DEFUALT_BALL_SPEED);
+        this.balls.push(ball);
     }
 }
