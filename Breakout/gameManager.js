@@ -1,4 +1,5 @@
 import { UIManager } from "./UIManager.js";
+import { ParticleSystem } from "./particleSystem.js";
 
 export class Ball{
     constructor(location, direction, speed){
@@ -82,7 +83,9 @@ export class GameManager{
     }
 
     static fillBricks(){
+        /** @type {Array<Brick>} */
         this.bricks = [];
+
         let startX = this.BRICK_MARGIN;
         let startY = this.BRICK_DISTANCE_FROM_TOP;
         for(let i = this.NUM_BRICK_ROWS - 1; i >= 0; i--){
@@ -299,12 +302,17 @@ export class GameManager{
             if(collision.type == "brick"){
                 try{
                     let rowLength = this.bricks[collision.brickIndex.row];
+                    let brick = this.bricks[collision.brickIndex.row][collision.brickIndex.column];
                     this.bricks[collision.brickIndex.row].splice(collision.brickIndex.column, 1);
                     this.incrementScore(this.BRICK_POINT_MAP[7 - collision.brickIndex.row]);
                     if(rowLength == 1){
                         this.incrementScore(25);
                     }
-                    
+                    for(let i = 0; i < this.BRICK_HEIGHT; i += this.BRICK_HEIGHT / 5){
+                        for(let j = 0; j < this.BRICK_WIDTH; j += this.BRICK_WIDTH / 10){
+                            ParticleSystem.addSquareParticle(ParticleSystem.generateSquareParticle({x: j + brick.topLeft.x, y: i + brick.topLeft.y}))
+                        }
+                    }
                 }
                 catch(err){
                     console.log(`failed to remove brick: ${err}`);

@@ -1,5 +1,7 @@
 //Written by Ryan Andersen A02288683 for CS5410
 import { GameManager, Ball, Paddle } from "./gameManager.js";
+import { ParticleSystem } from "./particleSystem.js";
+import { UIManager } from "./UIManager.js";
 
 export class Renderer {
     static {
@@ -25,13 +27,13 @@ export class Renderer {
         
         this.setImages();
 
-        this.PADDLE_COLOR_LIST = ["rgb(0, 0, 0)", "rgb(100, 100, 100)"];
+        this.PADDLE_COLOR_LIST = ["rgb(252,0,0)", "rgba(254,152,0)", "rgb(254,254,0)", "rgb(51,254,0)", "rgb(0,152,254)", "rgb(102,51,253)"];
         this.paddleColorIndex = 0;
         this.timePassedSinceLastColorChanged = 0;
     }
     
     static drawGame(timeElapsed){
-        if(this.bgImg){
+        if(this.bgImg && !UIManager.inAMenu){
             this.clear();
     
             this.ctx.drawImage(this.bgImg, 0, 0, this.canvas.width, this.canvas.height);
@@ -41,6 +43,7 @@ export class Renderer {
     
             this.drawLives();
             this.drawBricks(GameManager.bricks);
+            this.drawParticles();
             this.drawPaddle(GameManager.paddle, timeElapsed);
             this.drawBalls(GameManager.balls);
             this.drawTimer();
@@ -158,6 +161,28 @@ export class Renderer {
         this.ctx.fillStyle = "rgb(255, 255, 255)";
         this.ctx.font = ("20px sans-serif");
         this.ctx.fillText(`Score: ${GameManager.score}`, this.canvas.width * 0.83, this.canvas.height * 0.94);
+    }
+
+    static drawParticles(){
+        for(let i = 0; i < ParticleSystem.squareParticles.length; i++){
+            let posX = ParticleSystem.squareParticles[i].position.x * this.canvas.width;
+            let posY = ParticleSystem.squareParticles[i].position.y * this.canvas.height;
+
+            let translateX = posX + (ParticleSystem.squareParticles[i].size * this.canvas.width) / 2;
+            let translateY = posY + (ParticleSystem.squareParticles[i].size * this.canvas.height) / 2;
+
+            this.ctx.translate(translateX, translateY);
+            this.ctx.rotate((ParticleSystem.squareParticles[i].rotation * Math.PI) / 180)
+            this.ctx.translate(-translateX, -translateY);
+            
+            this.ctx.fillStyle = ParticleSystem.squareParticles[i].color;
+            this.ctx.fillRect(
+                ParticleSystem.squareParticles[i].position.x * this.canvas.width,
+                ParticleSystem.squareParticles[i].position.y * this.canvas.height,
+                ParticleSystem.squareParticles[i].size * this.canvas.width,
+                ParticleSystem.squareParticles[i].size * this.canvas.height);
+            this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        }
     }
 
     static async getImage(url){
