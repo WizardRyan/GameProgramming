@@ -122,8 +122,12 @@ export class Renderer {
             let height = GameManager.ALL_BALLS_DIAMETER * this.canvas.height;
 
             try{
-                this.ctx.drawImage(this.nyanCatImg, locX, locY, width, height);
-                // this.ctx.fillRect(locX, locY, width, height);
+                if(ball.direction.x < 0){
+                    this.ctx.drawImage(this.nyanCatLeftImg, locX, locY, width, height);
+                }
+                else{
+                    this.ctx.drawImage(this.nyanCatImg, locX, locY, width, height);
+                }
             }
             catch(err){
                 console.log(`image not loaded: ${err}`);
@@ -197,6 +201,7 @@ export class Renderer {
 
     static async setImages(){
         this.nyanCatImg = await this.getImage('./images/nyanCat.png');
+        this.nyanCatLeftImg = await this.getImage('./images/nyanCatLeft.png');
         this.bgImg = await this.getImage('./images/bg.jpg');
     }
 }

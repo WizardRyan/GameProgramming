@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: 100% !important;
     justify-content: center;
     align-items: center;
     background-image: url('images/bg.jpg');
@@ -16,6 +17,10 @@ body{
     height: 100%;
     margin: 0;
     padding: 0;
+}
+
+html{
+    height: 100%;
 }
 
 .menu-wrapper{
@@ -41,4 +46,25 @@ body{
 canvas{
     image-rendering: pixelated; 
     image-rendering: crisp-edges;
+}
+
+.score{
+    font-size: 25px;
+    color: white;
+    background: transparent;
+}
+
+#high-scores-display{
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
+.high-scores-list{
+    width: 330px;
+    background: transparent;
+}
+
+.credits-p{
+    font-size: 30px;
+    width: 400px;
 }

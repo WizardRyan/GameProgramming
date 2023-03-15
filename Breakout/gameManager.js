@@ -1,5 +1,6 @@
 import { UIManager } from "./UIManager.js";
 import { ParticleSystem } from "./particleSystem.js";
+import { SaveDataManager } from './saveDataManager.js';
 
 export class Ball{
     constructor(location, direction, speed){
@@ -114,7 +115,9 @@ export class GameManager{
 
         angle *= up ? -1 : 1;
         angle *= (Math.PI / 180);
-        return {x: Math.cos(angle), y: Math.sin(angle)};
+        let direction = {x: Math.cos(angle), y: Math.sin(angle)};
+        this.normalize(direction);
+        return direction;
     }
 
     static tick(elapsedTime){
@@ -277,6 +280,7 @@ export class GameManager{
     }
 
     static gameOver(){
+        SaveDataManager.addScore(this.score);
         UIManager.showGameOver();
     }
 

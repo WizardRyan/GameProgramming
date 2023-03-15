@@ -1,4 +1,5 @@
 import { GameManager } from "./gameManager.js";
+import { SaveDataManager } from "./saveDataManager.js";
 
 export class UIManager{
     static {
@@ -15,6 +16,8 @@ export class UIManager{
         this.backBttn = document.getElementById("back-button");
         this.gameOverEl = document.getElementById("game-over");
         this.scoreSpanEl = document.getElementById("score-span");
+        this.highScoresListEl = document.getElementById("high-scores-list");
+        this.clearHighScoresEl = document.getElementById("clear-high-scores");
 
         this.backableMenus = [this.creditsDisplayEl, this.highScoresDisplayEl, this.gameOverEl];
 
@@ -43,6 +46,11 @@ export class UIManager{
             this.setDefaultState();
         }
 
+        this.clearHighScoresEl.onclick = () => {
+            SaveDataManager.clearScores();
+            this.showHighScores();
+        }
+
         this.setDefaultState();
     }
  
@@ -66,6 +74,10 @@ export class UIManager{
     static showHighScores(){
         this.showGenericMenu(this.highScoresDisplayEl);
         //custom high scores func here
+        this.highScoresListEl.innerHTML = ``;
+        for(let score of SaveDataManager.getScores()){
+            this.highScoresListEl.innerHTML += `<li class="list-group-item score">${score}</li>`;
+        }
     }
 
     static showGameOver(){
