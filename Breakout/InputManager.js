@@ -32,7 +32,7 @@ export class InputManager {
     static processInputs(elapsedTime){
         if(GameManager.countDownTimer >= 3000 && !UIManager.inAMenu){
             for(let key of this.pressedKeys){
-                let movementAmount = GameManager.PLAYER_MOVEMENT_SPEED / elapsedTime;
+                let movementAmount = GameManager.PLAYER_MOVEMENT_SPEED * elapsedTime;
     
                 if(this.controls.right.includes(key)){
                     if(GameManager.paddle.location.x < 1.0  - GameManager.paddle.width){

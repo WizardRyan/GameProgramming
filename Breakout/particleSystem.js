@@ -41,7 +41,7 @@ export class ParticleSystem{
         return new SquareParticle(
             position,
             500, 
-            0.08, 
+            0.0008, 
             this.getRandomDirection(), 
             1, 
             this.getRandomSize(), 
@@ -78,8 +78,8 @@ export class ParticleSystem{
                 this.squareParticles.splice(i, 1);
             }
             else{
-                this.squareParticles[i].position.x += (this.squareParticles[i].velocity / elapsedTime) * this.squareParticles[i].direction.x;
-                this.squareParticles[i].position.y += (this.squareParticles[i].velocity / elapsedTime) * this.squareParticles[i].direction.y;
+                this.squareParticles[i].position.x += this.squareParticles[i].velocity * elapsedTime * this.squareParticles[i].direction.x;
+                this.squareParticles[i].position.y += this.squareParticles[i].velocity * elapsedTime * this.squareParticles[i].direction.y;
                 this.squareParticles[i].rotation += this.squareParticles[i].spin * (this.squareParticles[i].velocity/elapsedTime) * 2000;
                 this.squareParticles[i].size = this.squareParticles[i].originalSize * (this.squareParticles[i].lifetime / this.squareParticles[i].originalLifetime);
                 this.squareParticles[i].lifetime -= elapsedTime;

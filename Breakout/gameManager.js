@@ -7,7 +7,7 @@ export class Ball{
         this.direction = direction;
         this.speed = speed;
         this.numBricksRemoved = 0;
-        this.speedIncrement = 0.05;
+        this.speedIncrement = 0.0003;
         this.pointSteps = [4, 12, 36, 62];
     }
 
@@ -46,8 +46,8 @@ export class GameManager{
     static{
         this.BRICK_POINT_MAP = {0:1, 1:1, 2:2, 3:2, 4:3, 5:3, 6:5, 7:5};
         this.ALL_BALLS_DIAMETER = 0.05;
-        this.DEFUALT_BALL_SPEED = 0.1;
-        this.PLAYER_MOVEMENT_SPEED = 0.15;
+        this.DEFUALT_BALL_SPEED = 0.0004;
+        this.PLAYER_MOVEMENT_SPEED = 0.0005;
         this.NUM_BRICKS_IN_A_ROW = 14;
         this.NUM_BRICK_ROWS = 8;
         this.BRICK_MARGIN = .005;
@@ -134,7 +134,7 @@ export class GameManager{
     static shrinkPaddle(collisions, elapsedTime){
         if(this.paddle.shrinkToDeath){
             if(this.paddle.width > 0){
-                let shrinkSpeed = 0.05 / elapsedTime;
+                let shrinkSpeed = 0.0002 * elapsedTime;
                 this.paddle.width -= shrinkSpeed;
             }
         }
@@ -151,7 +151,7 @@ export class GameManager{
             }
             else if(this.paddle.isShrinking){
                 if(this.paddle.width > this.paddle.originalWidth / 2){
-                    let shrinkSpeed = 0.05 / elapsedTime;
+                    let shrinkSpeed = 0.0002 * elapsedTime;
                     this.paddle.width -= shrinkSpeed;
                 }
                 else{
@@ -203,7 +203,8 @@ export class GameManager{
                     this.balls[collision.ballIndex].incrementBricksRemoved();
                 }
                 else if (collision.type == "paddle"){
-                    this.balls[collision.ballIndex].direction = this.getReflectionVector(this.balls[collision.ballIndex].direction, {x:0, y:1});
+                    // this.balls[collision.ballIndex].direction = this.getReflectionVector(this.balls[collision.ballIndex].direction, {x:0, y:1});
+                    this.balls[collision.ballIndex].direction = this.getBallPaddleReflection(collision);
                 }
                 else if (collision.type == "wall"){
                     let normal = {x: 1, y:0};
@@ -226,9 +227,25 @@ export class GameManager{
             }
         }
         for(let ball of this.balls){
-            ball.location.x += (ball.direction.x * ball.speed) / elapsedTime;
-            ball.location.y += (ball.direction.y * ball.speed) / elapsedTime;
+            ball.location.x += ball.direction.x * ball.speed * elapsedTime;
+            ball.location.y += ball.direction.y * ball.speed * elapsedTime;
         }
+    }
+
+    static getBallPaddleReflection(collision){
+        let ball = this.balls[collision.ballIndex];
+        let ballCenter = ball.location.x + (this.ALL_BALLS_DIAMETER / 2);
+        let paddleCenter = this.paddle.location.x + (this.paddle.width /2);
+        let xDirection = (ballCenter - paddleCenter) / (this.paddle.width / 2);
+        let direction = {x: xDirection, y: -1};
+        this.normalize(direction);
+        return direction;
+    }
+
+    static normalize(vec2d){
+        let sum = Math.abs(vec2d.x) + Math.abs(vec2d.y);
+        vec2d.x /= sum;
+        vec2d.y /= sum;
     }
 
     static ballHitBottom(ballIndex){
