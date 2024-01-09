@@ -1,2 +1,2 @@
 # GameProgramming
-Practicing game programming principles in the browser
+Implementing game programming principles in the browser
